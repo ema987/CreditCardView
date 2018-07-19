@@ -44,6 +44,7 @@ public class CreditCardView extends FrameLayout {
 
     private boolean changeCardColor;
     private boolean showCardAnimation;
+    private boolean alwaysHideFrontCvv;
 
     int mCardnameLen;
 
@@ -105,6 +106,7 @@ public class CreditCardView extends FrameLayout {
 
         changeCardColor = a.getBoolean(R.styleable.creditcard_change_card_color, true);
         showCardAnimation = a.getBoolean(R.styleable.creditcard_show_card_animation, true);
+        alwaysHideFrontCvv = a .getBoolean(R.styleable.creditcard_always_hide_front_cvv, false);
         boolean showChipOnCard = a.getBoolean(R.styleable.creditcard_show_chip_on_card, true);
         if(!showChipOnCard) {
             View chipContainer = findViewById(R.id.chip_container);
@@ -188,7 +190,9 @@ public class CreditCardView extends FrameLayout {
         String cardNumber = CreditCardUtils.formatCardNumber(this.mRawCardNumber, CreditCardUtils.SPACE_SEPERATOR);
 
         ((TextView)findViewById(TEXTVIEW_CARD_NUMBER_ID)).setText(cardNumber);
-        ((TextView)findViewById(TEXTVIEW_CARD_CVV_AMEX_ID)).setVisibility(mCardType == CreditCardUtils.CardType.AMEX_CARD ? View.VISIBLE : View.GONE);
+        if(!alwaysHideFrontCvv) {
+            ((TextView) findViewById(TEXTVIEW_CARD_CVV_AMEX_ID)).setVisibility(mCardType == CreditCardUtils.CardType.AMEX_CARD ? View.VISIBLE : View.GONE);
+        }
 
         if(this.mCardType != CreditCardUtils.CardType.UNKNOWN_CARD) {
             this.post(new Runnable() {
