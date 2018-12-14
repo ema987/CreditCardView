@@ -141,35 +141,16 @@ public class CreditCardUtils {
             String mm = expiryString.substring(0, 2);
             String yy;
             text = mm;
-
-            try {
-                if (Integer.parseInt(mm) > 12) {
-                    mm = "12"; // Cannot be more than 12.
-                }
-            }
-            catch (Exception e) {
-                mm = "01";
-            }
-
+            
             if(expiryString.length() >=4) {
                 yy = expiryString.substring(2,4);
-
-                try{
-                    Integer.parseInt(yy);
-                }catch (Exception e) {
-
-                    Calendar calendar = Calendar.getInstance();
-                    int year = calendar.get(Calendar.YEAR);
-                    yy = String.valueOf(year).substring(2);
-                }
-
                 text = mm + SLASH_SEPERATOR + yy;
-
             }
             else if(expiryString.length() > 2){
                 yy = expiryString.substring(2);
                 text = mm + SLASH_SEPERATOR + yy;
             }
+
         }
         else {
             text = expiryString;
