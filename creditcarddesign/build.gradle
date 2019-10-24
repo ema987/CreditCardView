@@ -1,15 +1,16 @@
 apply plugin: 'com.android.library'
+apply plugin: 'maven-publish'
 
 android {
 
-    compileSdkVersion 25
-    buildToolsVersion "25.0.1"
+    compileSdkVersion 29
+    buildToolsVersion '29.0.1'
     defaultConfig {
         vectorDrawables.useSupportLibrary = true
-        minSdkVersion 10
-        targetSdkVersion 25
+        minSdkVersion 15
+        targetSdkVersion 29
         versionCode 1
-        versionName "1.0.3"
+        versionName "1.0.5"
     }
     buildTypes {
         release {
@@ -17,12 +18,75 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    lintOptions {
+        abortOnError false
+    }
+    compileOptions {
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+    }
 }
 
 dependencies {
-    final SUPPORT_VERSION = "25.0.1"
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.android.support:appcompat-v7:$SUPPORT_VERSION"
-    compile "com.android.support:cardview-v7:$SUPPORT_VERSION"
-    compile 'com.github.ozodrukh:CircularReveal:1.0.5'
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.github.ozodrukh:CircularReveal:2.0.1'
+}
+
+publishing {
+    publications {
+
+        String GROUP_ID = "com.github.sharish"
+        String ARTIFACT_ID = "CreditCardView"
+
+        android.libraryVariants.all { variant ->
+
+            "${variant.flavorName}${variant.buildType.name.capitalize()}"(MavenPublication) {
+
+                groupId GROUP_ID
+                artifactId ARTIFACT_ID + "-${variant.flavorName}${variant.buildType.name.capitalize()}"
+                version "1.0.5"
+
+                artifact("$buildDir/outputs/aar/${project.getName()}-${variant.buildType.name}.aar")
+                artifact(sourcesJar)
+                artifact(javadocJar)
+                pom.withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    configurations.implementation.allDependencies.each {
+                        if (it.group != null && (it.name != null || "unspecified" == it.name) && it.version != null) {
+                            def dependencyNode = dependenciesNode.appendNode('dependency')
+                            dependencyNode.appendNode('groupId', it.group)
+                            dependencyNode.appendNode('artifactId', it.name)
+                            dependencyNode.appendNode('version', it.version)
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+}
+
+// SOURCE AND JAVADOC PUBLISHING //
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.sourceFiles
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.compile
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
 }
