@@ -1,7 +1,7 @@
 package com.cooltechworks.creditcarddesign.sample;
 
+import android.app.Activity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,7 +16,7 @@ import com.cooltechworks.creditcarddesign.CreditCardUtils;
  * Created by glarencezhao on 10/23/16.
  */
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private final int CREATE_NEW_CARD = 0;
 
